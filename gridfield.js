@@ -9,7 +9,8 @@ $.fn.gridfield = function(options) {
   var settings = jQuery.extend({ 
     columnWidth: 200,
     gutter: 10,
-    yPadding: 10 }, options);
+    yPadding: 10,
+    resize: true }, options);
   
   var self = $(this);
   var columns = [];
@@ -18,7 +19,7 @@ $.fn.gridfield = function(options) {
 
   modules.each(function(i,m) { m.w = Math.ceil($(m).width()/(settings.columnWidth+settings.gutter)) });
   var updateColumnCount = function() { 
-    columnCount = Math.floor(($(window).width()-settings.gutter) / (settings.columnWidth + settings.gutter));
+    columnCount = Math.floor((self.width()-settings.gutter) / (settings.columnWidth + settings.gutter));
   }
   
   var heightSort = function(a,b) { 
@@ -58,15 +59,14 @@ $.fn.gridfield = function(options) {
       // update all spanned columns
       $(m).css({position:"absolute", top:next.y+"px", left:next.x*(settings.columnWidth+settings.gutter)+"px"}).show();
       $.each(columns.sort(leftToRightSort).slice(next.x,next.x+m.w), function(i,v) { v.y = next.y+$(m).height()+settings.yPadding; });
-      self.css({ height: columns.sort(heightSort)[columnCount-1].y,
-                 width: columnCount*(settings.columnWidth+settings.gutter)-settings.gutter });
+      self.height(columns.sort(heightSort)[columnCount-1].y);
     });
     
   }
 
-  $(window).resize(function() { 
-    arrange();
-  }); 
+  if (settings.resize) {
+    $(window).resize(arrange); 
+  }
 
   arrange();
   return self;
